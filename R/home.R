@@ -87,16 +87,25 @@ body_tags <- tags$body(
   ),
   tags$div(
     class = 'result-container',
-    style = '',
+    style = 'display:flex;',
+    tags$div(
+      class = 'graphs_container',
+      style = 'position:relative;width:100%;z-index:50;min-height:100vh;',
+      tags$iframe(
+        src = '../edicoes/resumo/resumo.html',
+        id = 'results_frame',
+        style = 'width:100%;height:auto;'
+      )
+    ),
     tags$div(
       class = 'select-container',
-      style = 'width:30%',
+      style = 'width:30%;margin-left:6px;position:absolute;z-index:100;',
       tags$label("Edição:", `for` = "filtro",
                  style = 'width:100%;display:block;margin-bottom:5px;'),
       tags$select(
         id = "filtro",
         class = "multi-select",
-        tags$option(value = "A", "Edição 1"),
+        tags$option(value = "resumo", "Resumo"),
         tags$option(value = "B", "Edição 2"),
         tags$option(value = "C", "Edição 3"),
         tags$option(value = "D", "Edição 4")

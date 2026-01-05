@@ -36,11 +36,14 @@
         <img src="image6.png" style="height:40px;display:block;"/>
       </div>
     </div>
-    <div class="result-container" style="">
-      <div class="select-container" style="width:30%">
+    <div class="result-container" style="display:flex;">
+      <div class="graphs_container" style="position:relative;width:100%;z-index:50;min-height:100vh;">
+        <iframe src="../edicoes/resumo/resumo.html" id="results_frame" style="width:100%;height:auto;"></iframe>
+      </div>
+      <div class="select-container" style="width:30%;margin-left:6px;position:absolute;z-index:100;">
         <label for="filtro" style="width:100%;display:block;margin-bottom:5px;">Edição:</label>
         <select id="filtro" class="multi-select">
-          <option value="A">Edição 1</option>
+          <option value="resumo">Resumo</option>
           <option value="B">Edição 2</option>
           <option value="C">Edição 3</option>
           <option value="D">Edição 4</option>
