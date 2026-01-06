@@ -34,7 +34,8 @@ df <- readRDS(params$file_path)
 ```
 
 
-<div class="fullcontainer" style="width:100%;display:flex;position:relative;">
+<div class="fullcontainer" style="width:100%;display:flex;position:relative;
+flex-wrap:wrap;gap:0px;">
 
 <style>
 h1.title.toc-ignore{
@@ -45,11 +46,11 @@ h1.title.toc-ignore{
 }
 </style>
 
-<div class="leftcol" style="width:33%;position:relative;display:block;">
+<div class="leftcol" style="width:29%;flex: 3 1 250px; position:relative;display:block;">
 
 ```{r whitediv, warning=FALSE,message=FALSE}
 
-tags$div(style = "width:100%;min-height:60px;isplay:block;background-color:white")
+tags$div(style = "width:100%;min-height:60px;display:block;background-color:white")
 
 
 ```
@@ -92,12 +93,70 @@ tags$div(
 
 </div>
 
-<div class="rightcol" style="width:67%;position:relative;display:block;">
+<div class="rightcol" style="width:70%;flex: 6 1 600px; position:relative;display:flex;">
 
 ```{r motivo_escolha,  warning=FALSE,message=FALSE}
 
-p <- df %>% 
+df2 <- df %>% 
   pull(por_que_escolheu_ou_escolhe_andar_de_bicicleta_agrupado) %>% 
+  str_split(';') %>% 
+  unlist() %>% 
+  str_trim() %>% 
+  table() %>% 
+  as_tibble() %>% 
+  setNames(c('value','n')) %>% 
+  mutate(base = 2) %>% 
+  arrange(-n) %>% 
+  mutate(theta = seq(0,360,trunc(360/n()))[1:n()]) %>% 
+  mutate(perc = scales::percent(n/sum(n),.1))
+
+p <- plot_ly(
+    data = df2,
+    type = "barpolar",
+    visible = TRUE,
+    r = ~n,
+    theta = ~theta,
+    base = ~base,
+    marker = list(
+      color = "#009889",
+      line = list(color = "white", width = 2)
+    ),
+    hovertemplate = "%{text}: %{r}<extra></extra>",
+    text = ~value
+  ) %>% 
+  layout(
+    showlegend = FALSE,
+    title = "Motivo da escolha da bicicleta",
+    polar = list(
+      angularaxis = list(
+        tickvals = df2$theta,
+        tickmode = "array",
+        ticktext = str_wrap(df2$value,13),
+        tickfont = list(
+          family = "Montserrat",
+          color = 'black'
+        ),
+        rotation = 90,
+        gridcolor = '#e0e0e0',
+        showline = F
+      ),
+      radialaxis = list(visible = FALSE)
+    ),
+    margin = list(l = 80, r = 80, t = 60, b = 60)
+  )
+
+tags$div(
+  style = "position:relative; width:50%;",
+  p
+)
+
+```
+
+
+```{r problemas,  warning=FALSE,message=FALSE}
+
+p <- df %>% 
+  pull(qual_e_o_principal_problema_que_voce_enfrenta_ao_andar_de_bicicleta_em_fortaleza_agrupado) %>% 
   str_split(";") %>% 
   unlist() %>% 
   str_trim() %>% 
@@ -107,34 +166,60 @@ p <- df %>%
   table() %>% 
   as_tibble() %>% 
   setNames(c("value","n")) %>% 
-  mutate(perc = scales::percent(n/sum(n),.1)) %>% 
-  mutate(value = fct_reorder(value,n)) %>% 
-  arrange(n) %>% 
-  plot_ly(
-    x = ~n,
-    y = ~value,
-    type = "bar",
-    text = ~perc,
-    name = "Motivo da escolha da bicicleta",
-    marker = list(
-      color = "#009889",
-      line = list(color = "#325565",width = 1)
+  mutate(perc = n/sum(n)) %>% 
+  arrange(-n)
+
+if(any(p$perc<0.02)){
+  p <- p %>% 
+    filter(perc>=0.02)
+  p <- bind_rows(
+    p,
+    tibble(
+      value = "Outros",
+      perc = 1-sum(p$perc)
     )
-  ) %>% 
-  layout(
-    title = "Motivo da escolha da bicicleta",
-    xaxis = list(title = "Contagem"),
-    yaxis = list(title = " ")
   )
+}
+
+p <- apply(p, 1, function(x){
+  perc <- as.numeric(x["perc"])
+  tags$div(
+    class = "kpi",
+    style = paste0("--p:",trunc(perc*100),";",
+                   "--c:#F15A22;"),
+    tags$div(
+      class = "donut",
+      tags$span(
+        scales::percent(perc,.1)
+      ),
+      tags$div(
+        class = "lbl",
+        x["value"]
+      )
+    )
+  )
+})
+
+s <- HTML(read_lines("../css/style_donut.css")) %>% tags$style()
 
 tags$div(
-  style = "position:relative; width:100%;",
-  p
+  style = "position:relative; width:50%;",
+  tags$div(
+    class = "grid",
+    p,
+    s
+  )
 )
 
 ```
 
+</div>
 
 </div>
+
+
+<div class="fullcontainer" style="width:100%;display:flex;position:relative;">
+
+<h2>Segunda Linha</h2>
 
 </div>
