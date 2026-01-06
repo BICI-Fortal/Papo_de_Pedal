@@ -1,0 +1,140 @@
+---
+title: "`r params$title`"
+output: 
+  html_document:
+    theme: null
+    self_contained: false
+params:
+  file_path: 'I:/.shortcut-targets-by-id/15QBAXOC5TdfNgOtQZh2jvqN37NjxkSM0/@BICI/06_Eixo Dados/Projetos/Papo de pedal/Edicao 270325/result/pesquisa_papo_pedal.rds'
+  title: 'Edição 25/10/2025'
+includes:
+  in_header:
+    style.css
+    actions.js
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,warning = FALSE,message = FALSE)
+library(tidyverse)
+library(data.table)
+library(plotly)
+library(leaflet)
+library(htmltools)
+library(htmlwidgets)
+```
+
+
+
+
+```{r data, warning=FALSE,message=FALSE}
+
+df <- readRDS(params$file_path)
+
+
+```
+
+
+<div class="fullcontainer" style="width:100%;display:flex;position:relative;">
+
+<style>
+h1.title.toc-ignore{
+  visibility: hidden;
+  height: 0px;
+  width: 0px;
+  margin: 0;
+}
+</style>
+
+<div class="leftcol" style="width:33%;position:relative;display:block;">
+
+```{r whitediv, warning=FALSE,message=FALSE}
+
+tags$div(style = "width:100%;min-height:60px;isplay:block;background-color:white")
+
+
+```
+
+
+```{r idade,  warning=FALSE,message=FALSE}
+
+p <- df %>% 
+  select(idade) %>% 
+  mutate(idade = as.numeric(idade)) %>% 
+  filter(!is.na(idade)) %>% 
+  filter(idade!='') %>% 
+  mutate(Idade_lbl = cut(idade,c(seq(0,80,10),100))) %>% 
+  group_by(Idade_lbl) %>% 
+  reframe(n = n()) %>% 
+  mutate(perc = scales::percent(n/sum(n),.1)) %>% 
+  plot_ly(
+    x = ~Idade_lbl,
+    y = ~n,
+    type = "bar",
+    text = ~perc,
+    name = "Idade dos respondentes",
+    marker = list(
+      color = "#009889",
+      line = list(color = "#325565",width = 1)
+    )
+  ) %>% 
+  layout(
+    title = "Idade dos respondentes",
+    xaxis = list(title = "Idade"),
+    yaxis = list(title = "Contagem")
+  )
+
+tags$div(
+  style = "position:relative; width:100%;",
+  p
+)
+
+```
+
+</div>
+
+<div class="rightcol" style="width:67%;position:relative;display:block;">
+
+```{r motivo_escolha,  warning=FALSE,message=FALSE}
+
+p <- df %>% 
+  pull(por_que_escolheu_ou_escolhe_andar_de_bicicleta_agrupado) %>% 
+  str_split(";") %>% 
+  unlist() %>% 
+  str_trim() %>% 
+  str_split(",") %>% 
+  unlist() %>% 
+  str_trim() %>% 
+  table() %>% 
+  as_tibble() %>% 
+  setNames(c("value","n")) %>% 
+  mutate(perc = scales::percent(n/sum(n),.1)) %>% 
+  mutate(value = fct_reorder(value,n)) %>% 
+  arrange(n) %>% 
+  plot_ly(
+    x = ~n,
+    y = ~value,
+    type = "bar",
+    text = ~perc,
+    name = "Motivo da escolha da bicicleta",
+    marker = list(
+      color = "#009889",
+      line = list(color = "#325565",width = 1)
+    )
+  ) %>% 
+  layout(
+    title = "Motivo da escolha da bicicleta",
+    xaxis = list(title = "Contagem"),
+    yaxis = list(title = " ")
+  )
+
+tags$div(
+  style = "position:relative; width:100%;",
+  p
+)
+
+```
+
+
+</div>
+
+</div>
