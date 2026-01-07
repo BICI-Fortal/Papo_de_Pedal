@@ -9,9 +9,10 @@
 
   .kpi{ text-align:center; }
   .lbl{
-    margin-top:8px; font-size:12px; color:#111; line-height:1.15;
+    margin-top:8px; font-size:12px; color:#111; line-height:1.05;
     position: relative;
     z-index:50;
+    font-family: Montserrat;
     padding-top: 65px;
     margin-left: -6px;
     margin-right: -6px;
@@ -52,4 +53,21 @@
     font-size:14px;
     color:#111;
     z-index:1;
+  }
+  
+  
+  .tooltip {
+    position: fixed;
+    font-family: Montserrat;
+    padding: 6px 10px;
+    background: #F15A22;
+    color: #fff;
+    font-size: 12px;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -120%);
+    transition: opacity 0.15s ease;
+    z-index: 9999;
+    white-space: nowrap;
   }

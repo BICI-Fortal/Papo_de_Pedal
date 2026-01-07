@@ -21,6 +21,13 @@ library(plotly)
 library(leaflet)
 library(htmltools)
 library(htmlwidgets)
+
+html_wrap <- function(x,w){
+  s <- str_wrap(x,w)
+  str_replace_all(s,"\\n","<br/>") %>% HTML() %>% 
+    return()
+}
+
 ```
 
 
@@ -43,6 +50,15 @@ h1.title.toc-ignore{
   height: 0px;
   width: 0px;
   margin: 0;
+}
+h1,h2,h3,h4{
+  font-family: Montserrat;
+  color: #414042;
+}
+g.g-gtitle>text{
+  font-family:Montserrat !important;
+  fill: #414042 !important;
+  font-weight: bold !important;
 }
 </style>
 
@@ -118,7 +134,7 @@ p <- plot_ly(
     theta = ~theta,
     base = ~base,
     marker = list(
-      color = "#009889",
+      color = "#00A0DC",
       line = list(color = "white", width = 2)
     ),
     hovertemplate = "%{text}: %{r}<extra></extra>",
@@ -147,7 +163,6 @@ p <- plot_ly(
 
 tags$div(
   style = "position:relative; width:55%;",
-  tags$h3("Principal problema enfrentado"),
   p
 )
 
@@ -190,11 +205,14 @@ p <- apply(p, 1, function(x){
                    "--c:#F15A22;"),
     tags$div(
       class = "donut",
+      `data-label`=html_wrap(x["value"],20),
+      `data-value`=percent(perc,.1),
       tags$span(
         scales::percent(perc,.1)
       ),
       tags$div(
         class = "lbl",
+        style = ifelse(str_width(x["value"])<40,"font-size:11px;",""),
         x["value"]
       )
     )
@@ -205,10 +223,12 @@ s <- HTML(read_lines("../css/style_donut.css")) %>% tags$style()
 
 tags$div(
   style = "position:relative; width:45%;",
+  tags$h4("Principal problema enfrentado"),
   tags$div(
     class = "grid",
     p,
-    s
+    s,
+    tags$script(HTML(read_lines("../js/popup_donut.js")))
   )
 )
 
