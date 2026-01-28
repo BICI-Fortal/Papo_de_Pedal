@@ -37,3 +37,8 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 .Rproj.user
+
+
+#secrets
+*/secrets/
+*gmail.com
