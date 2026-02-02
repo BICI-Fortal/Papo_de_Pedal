@@ -1,0 +1,99 @@
+/* sobre.css */
+
+.papo-pedal{
+  --text:#111827;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+  --soft:#f9fafb;
+
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  line-height: 1.65;
+  max-width: 90%;
+  margin-left:5%;
+}
+
+.papo-pedal h1{
+  margin: 0 0 14px;
+  font-size: clamp(28px, 3vw, 38px);
+  letter-spacing: -0.02em;
+}
+
+.papo-pedal h2{
+  margin: 26px 0 10px;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.papo-pedal p{
+  margin: 0;
+  color: var(--text);
+  text-align: justify;
+}
+
+.papo-pedal .muted{
+  color: var(--muted);
+}
+
+.papo-pedal .section{
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+
+.papo-pedal .section:first-of-type{
+  border-top: none;
+  padding-top: 0;
+}
+
+.papo-pedal .award{
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #00A0DC50;
+  margin-top: 10px;
+}
+
+.papo-pedal .award a{
+  display: block;
+  line-height: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #fff;
+  flex: 0 0 auto;
+  transition: transform 0.12s ease;
+}
+
+.papo-pedal .award a:hover{
+  transform: translateY(-1px);
+}
+
+.papo-pedal .award img{
+  display: block;
+  width: 110px;
+  height: auto;
+}
+
+.papo-pedal .award strong{
+  display: block;
+  font-size: 14px;
+  margin: 0 0 2px;
+}
+
+.papo-pedal .award span{
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 560px){
+  .papo-pedal .award{
+    align-items: flex-start;
+  }
+  .papo-pedal .award img{
+    width: 96px;
+  }
+}

@@ -24,6 +24,11 @@ function runfilter(){
   src_link = '../edicoes/'+ selected + '/' + selected + '.html';
   frame.setAttribute('src',src_link);
   
+  frame.onload = () => {
+    // Ajusta a altura com base no scrollHeight do conteúdo interno
+    frame.style.height = frame.contentWindow.document.body.scrollHeight + 'px';
+  };
+  
 }
 
 window.addEventListener("message", (event) => {

@@ -1,3 +1,19 @@
+a.page_selected{
+  color: #58B3A6;
+  font-size: large;
+  font-weight:bold;
+  margin-left:10px;
+  margin-right:10px;
+}
+
+a.page_unselected{
+  color: black;
+  font-size: large;
+  margin-left:10px;
+  margin-right:10px;
+  text-decoration:none;
+}
+
 .btn-padrao{
   background: #58B3A6;
   border-radius: 5px;
@@ -22,4 +38,48 @@ h1,h2,h3,h4{
 g.g-title>text{
   font-family:Montserrat !important;
   fill: #414042 !important;
+}
+
+.basefoot{
+  width:100%;
+  min-height: 150px;
+  background: #58b3a6;
+  display: block;
+  align-items: baseline;
+  padding-top: 20px;
+}
+
+.row{
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.foot_img{
+  margin-left: 20px;
+}
+
+.foot_img>img{
+  height: 70px;
+}
+
+.foot_img>a{
+  display:flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.circle_img{
+  background: #F15A22;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+
+.circle_img>img{
+  width: 28px;
 }

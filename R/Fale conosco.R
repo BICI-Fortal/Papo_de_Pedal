@@ -10,34 +10,6 @@ library(htmlwidgets)
 
 wd()
 
-descriptions <- list.files(
-  path = Sys.getenv('papo_pedal_project_path'),
-  pattern = 'description.txt',
-  full.names = T,recursive = T
-) %>% lapply(fread) %>% bind_rows()
-
-lbl_edition <- function(date){
-  dt <- as.POSIXct(as.character(date),format = '%Y%m%d')
-  paste0(
-    'Edição ',
-    sprintf('%02d',lubridate::day(dt)),'/',
-    sprintf('%02d',lubridate::month(dt)),'/',
-    lubridate::year(dt)
-  ) %>% return()
-}
-
-list_options <- function(editions_date){
-  tibble(
-    id = c('resumo',editions_date),
-    lbl = c('Resumo',lbl_edition(editions_date))
-  ) %>% apply(1, function(x){
-    tags$option(
-      value = x['id'],
-      x['lbl']
-    )
-  })
-}
-
 
 
 head_tags <- tags$head(
@@ -62,9 +34,9 @@ body_tags <- tags$body(
     tags$div(
       style = 'margin-left:auto;margin-right:auto;margin-top:auto; margin-bottom:auto;',
       tags$a(
-        class = "page_selected",
+        class = "page_unselected",
         'Início',
-        href = 'index.html'
+        href = '../home/index.html'
       ),
       tags$a(
         class = "page_unselected",
@@ -72,10 +44,9 @@ body_tags <- tags$body(
         href = '../sobre/sobre.html'
       ),
       tags$a(
-        class = "page_unselected",
+        class = "page_selected",
         'Fale conosco',
-        target = "_blank",
-        href = 'https://boradebike.vercel.app/contato'
+        href = 'contato.html'
       )
     )
   ),
@@ -91,7 +62,7 @@ body_tags <- tags$body(
         style = 'margin-left:5%;color:white;font-size:4vw;width:30%;'
       ),
       tags$h3(
-        'Portal de dados e resultados',
+        'Fale conosco',
         style = 'margin-left:5%;color:white;width:30%;font-size:3vw'
       )
     ),
@@ -110,32 +81,11 @@ body_tags <- tags$body(
     )
   ),
   tags$div(
-    class = 'result-container',
-    style = 'display:flex;',
-    tags$div(
-      class = 'graphs_container',
-      style = 'position:relative;width:100%;z-index:50;height:1000px;',
-      tags$iframe(
-        src = '../edicoes/resumo/resumo.html',
-        id = 'results_frame',
-        style = 'width:100%;height:100%;'
-      )
-    ),
-    tags$div(
-      class = 'select-container',
-      style = 'width:30%;margin-left:6px;position:absolute;z-index:100;',
-      tags$label("Edição:", `for` = "filtro",
-                 style = 'width:100%;display:block;margin-bottom:5px;'),
-      tags$select(
-        id = "filtro",
-        class = "multi-select",
-        list_options(descriptions$data)
-      ),
-      tags$button('Filtrar',id = 'filtro_btn',
-                  class = 'btn-padrao',onclick = 'runfilter()',
-                  style = 'width:40%;'),
-      tags$link(rel = "stylesheet", href = "../css/filtro.css"),
-      tags$script(src = '../js/filtro.js')
+    style = "width:100%;height:100vh;position:relative;",
+    tags$iframe(
+      src = "https://boradebike.vercel.app",
+      style = "width:100%;height:100vh;top:-150px;bottom:-240px;position:absolute;",
+      tags$a("https://boradebike.vercel.app/contato")
     )
   ),
   tags$div(
@@ -216,6 +166,6 @@ body_tags <- tags$body(
 page <- tags$html(lang = "pt-BR", head_tags, body_tags)
 
 
-save_html(page, file = '../home/index.html')
+save_html(page, file = '../contato/contato.html')
 
 
