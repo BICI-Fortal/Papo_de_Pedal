@@ -73,20 +73,20 @@
 
 .papo-pedal .award img{
   display: block;
-  width: 110px;
+  width: 150px;
   height: auto;
 }
 
 .papo-pedal .award strong{
   display: block;
-  font-size: 14px;
+  font-size: 34px;
   margin: 0 0 2px;
 }
 
 .papo-pedal .award span{
   display: block;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 20px;
 }
 
 @media (max-width: 560px){
