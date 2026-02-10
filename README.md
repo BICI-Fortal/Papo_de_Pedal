@@ -6,19 +6,15 @@ O Papo de Pedal nasce como solução para um dos principais desafios na constru�
 
 ## 🏆 A iniciativa é reconhecida pelo Prêmio Bicicleta Brasil
 
-<div class="papo-pedal" style="margin-left:0px !important;width:150% !important;">
+<div class="papo-pedal" style="margin-left:0px !important;width:100% !important;">
 <div class="award">
-<a href="teste" target="_blank">
-<img src="css/bicicleta_brasil.jpg" alt = "Selo do Prêmio Bicicleta Brasil">
+<a href="https://www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/mobilidade-urbana/programa-bicicleta-brasil/selo-do-programa-bicicleta-brasil" target="_blank">
+<img src="css/selo_renderizado.png" style="width:100%;" alt = "Selo do Prêmio Bicicleta Brasil">
 </img>
 </a>
-<div>
-<strong>Reconhecimento Nacional</strong>
-<span>O Papo de Pedal ganhou o prêmio Bicicleta Brasil</span>
-</div>
+
 </div>
 <p class="muted" style="margin-top:10px;">Clique no selo para acessar o site do prêmio.</p>
-<link rel="stylesheet" href="css/sobre.css">
 </div>
 
 ## Metodologia
