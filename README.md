@@ -9,7 +9,7 @@ O Papo de Pedal nasce como solução para um dos principais desafios na constru�
 <div class="papo-pedal" style="margin-left:0px !important;width:100% !important;">
 <div class="award">
 <a href="https://www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/mobilidade-urbana/programa-bicicleta-brasil/selo-do-programa-bicicleta-brasil" target="_blank">
-<img src="css/selo_renderizado.png" style="width:100%;" alt = "Selo do Prêmio Bicicleta Brasil">
+<img src="css/Premio Bicicleta.svg" style="width:100%;" alt = "Selo do Prêmio Bicicleta Brasil">
 </img>
 </a>
 
