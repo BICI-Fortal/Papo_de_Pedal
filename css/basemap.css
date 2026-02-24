@@ -20,6 +20,11 @@ html{
 .popup_edicao>h3{
   margin-bottom: -6px;
 }
+
+.popup_edicao.interna>h4{
+  margin-bottom: -8px;
+}
+
 .popup_edicao>p{
   margin-bottom: 2px;
 }
@@ -38,4 +43,10 @@ html{
 
 .popup_edicao>button:hover{
   cursor: pointer;
+}
+
+
+
+.info.legend{
+  scale: .9;
 }

@@ -8,6 +8,10 @@ wd()
 
 path <- Sys.getenv('papo_pedal_project_path')
 
+
+# data --------------------------------------------------------------------
+
+
 descriptions <- list.files(
   path = path,
   pattern = 'description.txt',
@@ -24,6 +28,15 @@ edicoes <- lapply(descriptions, fread) %>%
 edicoes <- edicoes %>% 
   rename('data_edicao'='data') %>% 
   mutate(data_edicao = as.character(data_edicao))
+
+internas <- read_excel(
+  list.files(path = path,pattern = "edicoes_reuniao", recursive = T, full.names = T)
+)
+
+
+# functions ---------------------------------------------------------------
+
+
 
 lbl_edition <- function(date){
   dt <- as.POSIXct(as.character(date),format = '%Y%m%d')
@@ -58,6 +71,21 @@ tag_popup <- function(date,address,btn = T){
   }
   
 }
+
+tag_popup_interna <- function(date,address,description){
+  tags$div(
+    class = 'popup_edicao interna',
+    tags$h3('Edição: ',format(as.Date(date),'%d/%m/%Y')),
+    tags$p(address),
+    tags$h4('Descrição:'),
+    tags$p(description)
+  ) %>% as.character()
+}
+
+
+
+# map ---------------------------------------------------------------------
+
 
 
 
@@ -109,7 +137,31 @@ for (i in 1:nrow(edicoes)) {
 }
 
 
+intern_icon <- makeAwesomeIcon(
+  icon = 'bicycle',
+  library = 'fa',
+  iconColor = '#F15A22',
+  markerColor = 'cadetblue'
+)
 
+internas$popup <- apply(internas,1,function(x){
+  tag_popup_interna(x['data'],x['address'],x['description'])
+})
+
+l <- l %>% 
+  addAwesomeMarkers(data = internas,
+                    lng = ~long, lat = ~lat, icon = intern_icon,
+                    popup = ~popup,
+                    group = 'Internas') %>% 
+  leaflegend::addLegendAwesomeIcon(
+    awesomeIconList(
+      `Edições de rua` = a_icon,
+      `Edições internas` = intern_icon,
+      `Edição selecionada` = b_icon
+    ),
+    title = 'Legenda',
+    position = 'bottomright'
+  )
 
 js_api <- readChar('../js/show_group_map.js',nchars = 5000)
 
