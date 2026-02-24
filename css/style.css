@@ -80,6 +80,11 @@ g.g-title>text{
   margin-right: 10px;
 }
 
+.iframe#results_frame{
+  margin-top:-5px;
+}
+
+
 .circle_img>img{
   width: 28px;
 }

@@ -13,7 +13,7 @@
     position: relative;
     z-index:50;
     font-family: Montserrat;
-    padding-top: 70px;
+    padding-top: 85px;
     margin-left: -6px;
     margin-right: -6px;
   }
@@ -27,6 +27,7 @@
     margin:0 auto;
     border-radius:50%;
     position:relative;
+    margin-bottom: 15px;
 
     /* anel + “trilho” */
     background:
