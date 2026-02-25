@@ -119,12 +119,13 @@ body_tags <- tags$body(
     style = 'display:flex;',
     tags$div(
       class = 'graphs_container',
-      style = 'position:relative;width:100%;z-index:50;height:1000px;',
+      style = 'position:relative;width:100%;z-index:50;height:1030px;',
       tags$iframe(
         src = '../edicoes/resumo/resumo.html',
         id = 'results_frame',
         style = 'width:100%;height:100%;'
-      )
+      ),
+      tags$script(src = "../js/change_graphs_height.js")
     ),
     tags$div(
       class = 'select-container',

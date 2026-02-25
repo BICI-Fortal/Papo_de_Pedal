@@ -1,3 +1,22 @@
-.body{
-  overflow-x: hidden !important;
+body::-webkit-scrollbar{
+  background: transparent;
+  width: 1px;
+  height: 1px;
+}
+
+.leftcol_bottom{
+  z-index: 7;
+}
+
+.rightcol_bottom{
+  z-index: 5;
+}
+
+.graph_troca_meio{
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+.plot-container.plotly{
+  height: 100%;
 }

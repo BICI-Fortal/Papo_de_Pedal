@@ -394,7 +394,7 @@ tags$div(
 <div class="fullcontainer" style="width:99vw;display:flex;position:relative;">
 
 
-<div class="leftcol_bottom" style="width:70%;flex: 6 1 600px; position:relative;display:flex;">
+<div class="leftcol_bottom" style="width:70%;flex: 5 1 600px; position:relative;display:flex;">
 
 ```{r leafletmap, warning=FALSE,message=FALSE}
 
@@ -504,7 +504,7 @@ p <- df %>%
     x = rep(1:3,n())[1:n()],
     y = sapply(ceiling(n()/3):1, rep,times = 3)[1:n()]
   ) %>% 
-  mutate(y = y*1.4) %>% 
+  mutate(y = y*1.8) %>% 
   mutate(norm_n = (100*(n/sum(n))) %>% ifelse(.<15,15,.)) %>% 
   mutate(value = html_single_wrap(value,14))
 
@@ -522,12 +522,14 @@ p <- plot_ly(
   marker = list(size = ~norm_n, opacity = 0.5)
 ) %>% 
   layout(title = 'Você gostaria de trocar a bicicleta\npor outro meio de transporte?',
-         xaxis = list(showgrid = FALSE, visible = F),
+         xaxis = list(showgrid = FALSE, visible = F,
+                      range = c(max(c(0,min(p$x)-.4)),max(p$x)+.3)),
          yaxis = list(showgrid = FALSE, visible = F,
-                      range = c(0,max(p$y)+0.5)),
-         margin = list(b = 60,t = 70,r = 20, l = 10))
+                      range = c(0,max(p$y)+1)),
+         margin = list(b = 0,t = 70,r = 0, l = 0))
 
 tags$div(
+  class = "graph_troca_meio",
   style = "width:100%",
   p
 )

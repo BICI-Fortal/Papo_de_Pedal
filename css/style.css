@@ -92,3 +92,7 @@ g.g-title>text{
 .foot_img:hover{
   cursor: pointer !important;
 }
+
+.result-container{
+  margin-top: -5px;
+}

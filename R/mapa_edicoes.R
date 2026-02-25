@@ -152,7 +152,10 @@ l <- l %>%
   addAwesomeMarkers(data = internas,
                     lng = ~long, lat = ~lat, icon = intern_icon,
                     popup = ~popup,
-                    group = 'Internas') %>% 
+                    group = 'Internas',
+                    clusterOptions = markerClusterOptions(
+                      maxClusterRadius = 30
+                    )) %>% 
   leaflegend::addLegendAwesomeIcon(
     awesomeIconList(
       `Edições de rua` = a_icon,
