@@ -54,6 +54,12 @@ description <- params$file_path %>%
 
 ```
 
+```{r style, warning=FALSE,message=FALSE}
+tags$div(
+  tags$link(href = "../../css/style_edicoes.css",
+            rel = "stylesheet")
+)
+```
 
 ```{r header2, warning=FALSE,message=FALSE}
 
