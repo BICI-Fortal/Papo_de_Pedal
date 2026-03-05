@@ -37,14 +37,21 @@ htmls <- list.dirs(
   basename() %>% 
   str_remove('\\.html')
 
-library(svDialogs)
-
-resp <- dlgMessage('Deseja gerar novamente HTMLs prontos?',type = 'yesno')
-
-if(resp$res!='yes'){
+if(interactive()){
+  library(svDialogs)
+  
+  resp <- dlgMessage('Deseja gerar novamente HTMLs prontos?',type = 'yesno')
+  
+  if(resp$res!='yes'){
+    paths <- paths[nm%in%htmls==FALSE]
+    nm <- nm[nm %in% htmls == FALSE]
+  }
+  
+}else{
   paths <- paths[nm%in%htmls==FALSE]
   nm <- nm[nm %in% htmls == FALSE]
 }
+
 
 # lapply(paths, function(x){
 #   list(
@@ -106,7 +113,8 @@ for (i in 1:length(file_paths)) {
     params = list(file_path = file_paths[[i]],
                   title = edicao),
     output_dir = paste0('../edicoes/',nm[i],'/'),
-    output_file = paste0(nm[i],'.html')
+    output_file = paste0(nm[i],'.html'),
+    envir = new.env()
   ) %>% tryCatch(error = function(e){
     sink('logs.txt',append = T)
     print('\nfile:\n')

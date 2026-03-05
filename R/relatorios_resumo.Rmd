@@ -1,12 +1,11 @@
 ---
-title: "`r params$title`"
+title: "Resumo"
 output: 
   html_document:
     theme: null
     self_contained: false
 params:
-  file_path: 'H:/.shortcut-targets-by-id/15QBAXOC5TdfNgOtQZh2jvqN37NjxkSM0/@BICI/06_Eixo Dados/Projetos/Papo de pedal/Edicao 051224/result/pesquisa_papo_pedal.rds'
-  title: 'Edição 05/12/2024'
+  file_path: ""
 includes:
   in_header:
     style.css
@@ -45,12 +44,47 @@ html_single_wrap <- function(x,w){
 
 ```{r data, warning=FALSE,message=FALSE}
 
-df <- readRDS(params$file_path)
+paths <- list.dirs(
+  path = Sys.getenv('papo_pedal_project_path'),
+  recursive = F
+)
 
-description <- params$file_path %>% 
-  dirname() %>% dirname() %>% 
-  paste0("/description.txt") %>% 
-  fread()
+
+paths <- paths[str_detect(paths,'Edicao')]
+
+nm <- sapply(paths, function(x){
+  fread(paste0(x,'/description.txt'))$data
+})
+
+paths <- paste0(paths,'/result/') %>% setNames(nm)
+
+files_result <- paste0(paths,"pesquisa_papo_pedal.rds")
+
+descriptions <- list.files(
+  path = Sys.getenv('papo_pedal_project_path'),
+  pattern = 'description.txt',
+  full.names = T,recursive = T
+)
+
+descriptions <- lapply(descriptions, fread) %>% 
+  bind_rows()
+
+internas <- read_excel(
+  list.files(path = Sys.getenv('papo_pedal_project_path'),
+             pattern = "edicoes_reuniao", recursive = T, full.names = T)
+)
+
+df <- lapply(files_result, function(x){
+  readRDS(x) %>% 
+    janitor::clean_names() %>% 
+    select(genero,idade,ends_with("agrupado")) %>% 
+    mutate(
+      edicao = str_split(x,'/') %>% unlist() %>% 
+        Filter2(str_detect,pattern = 'Edicao') %>%
+        str_remove('Edicao') %>% str_trim()
+    )
+}) %>% bind_rows()
+
 
 ```
 
@@ -177,6 +211,23 @@ tags$div(
 
 ```
 
+```{r resumo, warning=FALSE,message=FALSE}
+
+tags$div(
+  class = "fullcontainer",
+  style = "width: calc(100% + 20px);display:flex;
+  position:relative;flex-wrap:wrap;gap:0px;
+  margin-left:-10px;margin-right:-10px;margin-top:-10px;
+  margin-bottom:10px;
+  background: #00A0DC40; border-bottom: solid 1px #00A0DC",
+  tags$table(
+    class = "tbl_resumo",
+    
+  )
+)
+
+
+```
 
 <div class="fullcontainer" style="width:100%;display:flex;position:relative;
 flex-wrap:wrap;gap:0px;">
@@ -217,109 +268,33 @@ table.sinistros>tbody>tr>td{
 ```{r idade,  warning=FALSE,message=FALSE}
 
 p <- df %>% 
-  janitor::clean_names() %>% 
-  select(idade,genero) %>% 
+  select(idade) %>% 
   mutate(idade = as.numeric(idade)) %>% 
   filter(!is.na(idade)) %>% 
   filter(idade!='') %>% 
-  mutate(Idade_lbl = cut(idade,c(seq(0,80,10),100))) 
-
-if(length(unique(p$Idade_lbl))<4){
-  p <- p %>% 
-    mutate(Idade_lbl = cut(idade,c(seq(0,80,5),100)))
-}
-
-p <- p %>%
-  mutate(genero = if_else(str_detect(genero,"M|Masc|Homem"),"Masculino",
-                          if_else(is.na(genero),"ND","Feminino"))) %>% 
-  group_by(Idade_lbl,genero) %>%
-  reframe(n = n()) %>%
+  mutate(Idade_lbl = cut(idade,c(seq(0,80,10),100))) %>% 
   group_by(Idade_lbl) %>% 
-  mutate(perc = scales::percent(n/sum(n),.1)) 
-
-n_groups <- length(unique(p$Idade_lbl))
-
-p <- plot_ly() %>%
-  add_trace(
-    data = p %>% filter(genero=="Masculino"),
+  reframe(n = n()) %>% 
+  mutate(perc = scales::percent(n/sum(n),.1)) %>% 
+  plot_ly(
     x = ~Idade_lbl,
     y = ~n,
     type = "bar",
     text = ~perc,
-    name = "Masculino",
+    name = "Idade dos respondentes",
     marker = list(
       color = "#009889",
       line = list(color = "#325565",width = 1)
     )
-  ) %>%
-  add_trace(
-    data = p %>% filter(genero=="Feminino"),
-    x = ~Idade_lbl,
-    y = ~n,
-    type = "bar",
-    text = ~perc,
-    name = "Feminino",
-    marker = list(
-      color = "#F15A22",
-      line = list(color = "#325565",width = 1)
-    )
-  )  %>%
-  add_trace(
-    data = p %>% filter(genero=="ND"),
-    x = ~Idade_lbl,
-    y = ~n,
-    type = "bar",
-    text = ~perc,
-    name = "Sem dado",
-    marker = list(
-      color = "#F15A22",
-      line = list(color = "#325565",width = 1)
-    )
-  ) %>%
+  ) %>% 
   layout(
-    title = "Idade e gênero dos respondentes",
-    xaxis = list(title = "Idade",range = c(0,n_groups+0.5)),
-    yaxis = list(title = "Contagem"),
-    legend = list(x = .5, y = -.2,
-                  orientation = "h",
-                  xanchor = "center",
-                  bgcolor = "#ffffff00"),
-    margin = list(b = -25)
+    title = "Idade dos respondentes",
+    xaxis = list(title = "Idade"),
+    yaxis = list(title = "Contagem")
   )
 
-# n_groups <- length(unique(p$Idade_lbl))
-# p <- p %>% 
-#   group_by(Idade_lbl,genero) %>% 
-#   reframe(n = n()) %>% 
-#   mutate(perc = scales::percent(n/sum(n),.1))
-# 
-# p <- plot_ly() %>%
-#   add_trace(
-#     data = p %>% filter(genero=='Masculino'),
-#     x = ~Idade_lbl,
-#     y = ~n,
-#     type = "bar",
-#     text = ~perc,
-#     name = "Masculino",
-#     marker = list(
-#       color = "#009889",
-#       line = list(color = "#325565",width = 1)
-#     )
-#   ) %>% 
-#   layout(
-#     title = "Idade dos respondentes",
-#     xaxis = list(title = "Idade",range = c(0,n_groups+0.5)),
-#     yaxis = list(title = "Contagem"),
-#     legend = list(x = .5, y = -.2,
-#                   orientation = "h",
-#                   xanchor = "center",
-#                   bgcolor = "#ffffff00"),
-#     margin = list(b = -25)
-#   )
-
-
 tags$div(
-  style = "position:relative; width: calc(100% + 40px);margin-right:-30px;margin-left:-10px;",
+  style = "position:relative; width:100%;",
   p
 )
 
@@ -327,7 +302,7 @@ tags$div(
 
 </div>
 
-<div class="rightcol_top" style="width:70%;flex: 5 1 600px; position:relative;display:flex;">
+<div class="rightcol_top" style="width:70%;flex: 6 1 600px; position:relative;display:flex;">
 
 ```{r motivo_escolha,  warning=FALSE,message=FALSE}
 
@@ -505,10 +480,10 @@ tags$div(
 if("sofreu_algum_acidente_no_ultimo_ano_agrupado" %in% names(df) &
    "tem_medo_de_sofrer_acidentes_andando_de_bicicleta_em_fortaleza_agrupado" %in%  names(df)){
   
-  resp1 <- df$tem_medo_de_sofrer_acidentes_andando_de_bicicleta_em_fortaleza_agrupado
-  resp1 <- resp1[resp1!=""] %>% na.exclude()
+  resp1 <- df$voce_tem_medo_de_acidente_andando_de_bicicleta_em_fortaleza
+  resp1 <- resp[resp!=""] %>% na.exclude()
   resp2 <- df$sofreu_algum_acidente_no_ultimo_ano_agrupado
-  resp2 <- resp2[resp2!=""] %>% na.exclude()
+  resp2 <- resp[resp!=""] %>% na.exclude()
   
   tags$table(
       class = "sinistros",style="max-height:100px;",
@@ -523,8 +498,7 @@ if("sofreu_algum_acidente_no_ultimo_ano_agrupado" %in% names(df) &
           tags$p(
             paste0(
               scales::percent(sum(str_detect(resp1,
-                                          "Sim|sim|SIM"),
-                                  na.rm = T)/length(resp1)),
+                                          "Sim|sim|SIM"))/length(resp)),
               " tem medo de acidentes"
             )
           )
@@ -539,8 +513,7 @@ if("sofreu_algum_acidente_no_ultimo_ano_agrupado" %in% names(df) &
           tags$p(
             paste0(
               scales::percent(sum(str_detect(resp2,
-                                          "Sim|sim|SIM"),
-                                  na.rm = T)/length(resp2)),
+                                          "Sim|sim|SIM"))/length(resp)),
               " sofreu acidente no último ano"
             )
           )
@@ -552,7 +525,7 @@ if("sofreu_algum_acidente_no_ultimo_ano_agrupado" %in% names(df) &
 }else{
   
   if("tem_medo_de_sofrer_acidentes_andando_de_bicicleta_em_fortaleza_agrupado" %in% names(df)){
-    resp <- df$tem_medo_de_sofrer_acidentes_andando_de_bicicleta_em_fortaleza_agrupado
+    resp <- df$voce_tem_medo_de_acidente_andando_de_bicicleta_em_fortaleza
     resp <- resp[resp!=""] %>% na.exclude()
     
     tags$table(
@@ -569,8 +542,7 @@ if("sofreu_algum_acidente_no_ultimo_ano_agrupado" %in% names(df) &
           tags$p(
             paste0(
               scales::percent(sum(str_detect(resp,
-                                          "Sim|sim|SIM"),
-                                  na.rm = T)/length(resp)),
+                                          "Sim|sim|SIM"))/length(resp)),
               " tem medo de acidentes"
             )
           )
@@ -599,8 +571,7 @@ if("sofreu_algum_acidente_no_ultimo_ano_agrupado" %in% names(df) &
           tags$p(
             paste0(
               scales::percent(sum(str_detect(resp,
-                                          "Sim|sim|SIM"),
-                                  na.rm = T)/length(resp)),
+                                          "Sim|sim|SIM"))/length(resp)),
               " sofreu acidente no último ano"
             )
           )
