@@ -57,7 +57,8 @@ description <- params$file_path %>%
 ```{r style, warning=FALSE,message=FALSE}
 tags$div(
   tags$link(href = "../../css/style_edicoes.css",
-            rel = "stylesheet")
+            rel = "stylesheet"),
+  tags$script(src = "../../js/send_height.js")
 )
 ```
 
@@ -230,8 +231,8 @@ if(length(unique(p$Idade_lbl))<4){
 }
 
 p <- p %>%
-  mutate(genero = if_else(str_detect(genero,"M|Masc|Homem"),"Masculino",
-                          if_else(is.na(genero),"ND","Feminino"))) %>% 
+  mutate(genero = if_else(str_detect(genero,"M|Masc|Homem|homem|masc"),"Masculino",
+                          if_else(str_detect(genero,"F|Femin|Mulher|mulher|femin"),"Feminino","ND"))) %>% 
   group_by(Idade_lbl,genero) %>%
   reframe(n = n()) %>%
   group_by(Idade_lbl) %>% 
@@ -249,7 +250,7 @@ p <- plot_ly() %>%
     name = "Masculino",
     marker = list(
       color = "#009889",
-      line = list(color = "#325565",width = 1)
+      line = list(color = "#325565",width = 0)
     )
   ) %>%
   add_trace(
@@ -261,7 +262,7 @@ p <- plot_ly() %>%
     name = "Feminino",
     marker = list(
       color = "#F15A22",
-      line = list(color = "#325565",width = 1)
+      line = list(color = "#325565",width = 0)
     )
   )  %>%
   add_trace(
@@ -273,7 +274,7 @@ p <- plot_ly() %>%
     name = "Sem dado",
     marker = list(
       color = "#F15A22",
-      line = list(color = "#325565",width = 1)
+      line = list(color = "#325565",width = 0)
     )
   ) %>%
   layout(

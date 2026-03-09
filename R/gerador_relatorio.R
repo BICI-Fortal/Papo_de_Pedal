@@ -141,3 +141,9 @@ for (i in 1:length(file_paths)) {
 #   output_file = '20250327.html'
 # )
 
+
+rmarkdown::render(
+  input = 'relatorio_resumo.Rmd',
+  output_dir = '../edicoes/resumo',
+  output_file = 'resumo.html'
+)

@@ -20,3 +20,51 @@ body::-webkit-scrollbar{
 .plot-container.plotly{
   height: 100%;
 }
+
+
+table.tbl_resumo{
+  background:white;
+  width: 100%;
+}
+
+table.tbl_resumo>tr{
+  width: 100%;
+}
+
+.box{
+  width: 100%;
+  display: flex;
+  border: solid 1px #00A0DC;
+  border-radius: 5px;
+}
+
+.box_info{
+  background: #00A0DC50;
+  align-items: center;
+}
+
+.box_info>span{
+  font-size: 4em;
+  padding-left: 5%;
+}
+
+.box_info>p{
+  margin-top: auto;
+}
+
+.box_info>img{
+  padding-left: 5px;
+}
+
+
+.visit_bora_bike{
+  display: flex;
+  text-decoration: none;
+  color: black;
+  margin-left: 10px;
+}
+
+.visit_bora_bike>p{
+  width: 60%;
+  margin-right: 5px;
+}

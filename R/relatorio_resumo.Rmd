@@ -14,8 +14,7 @@ includes:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,warning = FALSE,message = FALSE)
-library(tidyverse)
-library(data.table)
+library(LDA)
 library(plotly)
 library(leaflet)
 library(htmltools)
@@ -85,13 +84,15 @@ df <- lapply(files_result, function(x){
     )
 }) %>% bind_rows()
 
+fwrite(df,"../edicoes/resumo/papo_pedal.csv")
 
 ```
 
 ```{r style, warning=FALSE,message=FALSE}
 tags$div(
   tags$link(href = "../../css/style_edicoes.css",
-            rel = "stylesheet")
+            rel = "stylesheet"),
+  tags$script(src = "../../js/send_height.js")
 )
 ```
 
@@ -125,13 +126,13 @@ tags$div(
       tags$td(
         style = "width:35%;",
         tags$span(
-            "Baixe os dados dessa edição:",
+            "Baixe os dados completos:",
             tags$br(),
             tags$span(
               tags$a(
-                href = paste0("pesquisa_",description$data,".csv"),
+                href = paste0("papo_pedal.csv"),
                 style = "text-decoration:none;",
-                download = paste0("pesquisa_",description$data,".csv"),
+                download = paste0("papo_pedal.csv"),
                 tags$span(
                   class = "tip",
                   tags$span(
@@ -213,16 +214,94 @@ tags$div(
 
 ```{r resumo, warning=FALSE,message=FALSE}
 
+box_info <- function(value,text,speed){
+  tags$div(
+    class = "box box_info",
+    tags$img(src = "../../css/noun_information.svg", width = "60px"),
+    tags$span(value),
+    tags$p(text)
+  )
+}
+
+box_info_dinamic <- function(value,text,speed = 200){
+  tags$div(
+    class = "box box_info",
+    tags$img(src = "../../css/noun_people.svg", width = "60px"),
+    tags$span(class = "info_counter",`data-target`=value,`data-speed`=speed,0),
+    tags$p(text),
+    tags$script(src = "../../js/counter.js")
+  )
+}
+
+
 tags$div(
   class = "fullcontainer",
   style = "width: calc(100% + 20px);display:flex;
   position:relative;flex-wrap:wrap;gap:0px;
   margin-left:-10px;margin-right:-10px;margin-top:-10px;
-  margin-bottom:10px;
-  background: #00A0DC40; border-bottom: solid 1px #00A0DC",
+  margin-bottom:10px; border: solid 0px",
   tags$table(
     class = "tbl_resumo",
-    
+    tags$tr(
+      tags$td(
+        style = "width:35%",
+        tags$div(
+          style = "display:flex;",
+          tags$img(src = "../../css/bora_de_bike.png",height = "150px"),
+          tags$div(
+          tags$p(
+            "O ",tags$strong("Papo de Pedal"),
+            " é o principal política de escuta ao cidadão ciclista de Fortaleza.",
+            tags$br(),
+            "O projeto faz parte do programa ",tags$strong("Bora de Bike"),
+            "...",
+            style = "font-size:larger;",
+            tags$a("ler mais",href = "../../sobre/sobre.html",target = "_top")
+          )
+        )
+        )
+      ),
+      tags$td(
+        style = "width: 65%",
+        tags$table(
+          class = "tbl_resumo subtable",
+          tags$tr(
+            tags$td(
+              style = "width: 33%",
+              box_info(nrow(descriptions)+nrow(internas),
+                       text = "edições realizadas!")
+            ),
+            tags$td(
+              style = "width: 33%",
+              box_info(nrow(descriptions),
+                       text = "edições na rua")
+            ),
+            tags$td(
+              style = "width: 33%",
+              box_info(nrow(internas),
+                       text = "edições internas")
+            )
+          ),
+          tags$tr(
+            tags$td(
+              style = "width: 64%",
+              colspan = "2",
+              box_info_dinamic(nrow(df),text = "pessoas ouvidas no Papo de Pedal",
+                               speed = 300)
+            ),
+            tags$td(
+              style = "width: 33%",
+              tags$a(
+                class = "visit_bora_bike",
+                href = "https://boradebike.vercel.app/",target = "_blank",
+                tags$p("Visite também o site do Bora de Bike"),
+                tags$img(src = "../../css/bora_de_bike.png",height = "70px")
+              )
+            )
+          )
+        )
+      )
+    )
   )
 )
 
@@ -268,33 +347,74 @@ table.sinistros>tbody>tr>td{
 ```{r idade,  warning=FALSE,message=FALSE}
 
 p <- df %>% 
-  select(idade) %>% 
+  janitor::clean_names() %>% 
+  select(idade,genero) %>% 
   mutate(idade = as.numeric(idade)) %>% 
   filter(!is.na(idade)) %>% 
   filter(idade!='') %>% 
-  mutate(Idade_lbl = cut(idade,c(seq(0,80,10),100))) %>% 
+  mutate(Idade_lbl = cut(idade,c(seq(0,80,10),100))) 
+
+p <- p %>%
+  mutate(genero = if_else(str_detect(genero,"M|Masc|Homem|homem|masc"),"Masculino",
+                          if_else(str_detect(genero,"F|Femin|Mulher|mulher|femin"),"Feminino","ND"))) %>% 
+  group_by(Idade_lbl,genero) %>%
+  reframe(n = n()) %>%
   group_by(Idade_lbl) %>% 
-  reframe(n = n()) %>% 
-  mutate(perc = scales::percent(n/sum(n),.1)) %>% 
-  plot_ly(
+  mutate(perc = scales::percent(n/sum(n),.1)) 
+
+n_groups <- length(unique(p$Idade_lbl))
+
+p <- plot_ly() %>%
+  add_trace(
+    data = p %>% filter(genero=="Masculino"),
     x = ~Idade_lbl,
     y = ~n,
     type = "bar",
     text = ~perc,
-    name = "Idade dos respondentes",
+    name = "Masculino",
     marker = list(
       color = "#009889",
-      line = list(color = "#325565",width = 1)
+      line = list(color = "#325565",width = 0)
     )
-  ) %>% 
+  ) %>%
+  add_trace(
+    data = p %>% filter(genero=="Feminino"),
+    x = ~Idade_lbl,
+    y = ~n,
+    type = "bar",
+    text = ~perc,
+    name = "Feminino",
+    marker = list(
+      color = "#F15A22",
+      line = list(color = "#325565",width = 0)
+    )
+  )  %>%
+  # add_trace(
+  #   data = p %>% filter(genero=="ND"),
+  #   x = ~Idade_lbl,
+  #   y = ~n,
+  #   type = "bar",
+  #   text = ~perc,
+  #   name = "Sem dado",
+  #   marker = list(
+  #     color = "#00A0DC",
+  #     line = list(color = "#325565",width = 0)
+  #   )
+  # ) %>%
   layout(
-    title = "Idade dos respondentes",
-    xaxis = list(title = "Idade"),
-    yaxis = list(title = "Contagem")
+    title = "Idade e gênero dos respondentes",
+    xaxis = list(title = "Idade",range = c(0,n_groups+0.01)),
+    yaxis = list(title = "Contagem"),
+    legend = list(x = .5, y = -.2,
+                  orientation = "h",
+                  xanchor = "center",
+                  bgcolor = "#ffffff00"),
+    margin = list(b = -25)
   )
 
+
 tags$div(
-  style = "position:relative; width:100%;",
+  style = "position:relative; width: calc(100% + 40px);margin-right:-30px;margin-left:-10px;",
   p
 )
 
@@ -363,13 +483,6 @@ tags$div(
 
 
 ```{r problemas,  warning=FALSE,message=FALSE}
-
-if("qual_e_o_principal_problema_que_voce_enfrenta_ao_pedalar_em_fortaleza_agrupado" %in% names(df)){
-  try({
-  df <- df %>% 
-    rename("qual_e_o_principal_problema_que_voce_enfrenta_ao_andar_de_bicicleta_em_fortaleza_agrupado"="qual_e_o_principal_problema_que_voce_enfrenta_ao_pedalar_em_fortaleza_agrupado")
-  },silent = T)
-}
 
 
 
@@ -456,14 +569,7 @@ tags$div(
     style = "width:100%;height:100%;border:none;",
     id = "leafmap_edicoes",
     loading = "lazy"
-  ),
-  tags$script(
-      readChar("../js/show_group.js",nchars = 9000) %>% 
-        str_replace_all("GRUPO_ID",
-                        as.character(description$data)) %>% 
-        str_replace("LONGITUDE",as.character(description$long)) %>% 
-        str_replace("LATITUDE",as.character(description$lat))
-    )
+  )
 )
 
 
@@ -477,13 +583,14 @@ tags$div(
 
 ```{r sinistros, warning=FALSE,message=FALSE}
 
+
 if("sofreu_algum_acidente_no_ultimo_ano_agrupado" %in% names(df) &
    "tem_medo_de_sofrer_acidentes_andando_de_bicicleta_em_fortaleza_agrupado" %in%  names(df)){
   
-  resp1 <- df$voce_tem_medo_de_acidente_andando_de_bicicleta_em_fortaleza
-  resp1 <- resp[resp!=""] %>% na.exclude()
+  resp1 <- df$tem_medo_de_sofrer_acidentes_andando_de_bicicleta_em_fortaleza_agrupado
+  resp1 <- resp1[resp1!=""] %>% na.exclude()
   resp2 <- df$sofreu_algum_acidente_no_ultimo_ano_agrupado
-  resp2 <- resp[resp!=""] %>% na.exclude()
+  resp2 <- resp2[resp2!=""] %>% na.exclude()
   
   tags$table(
       class = "sinistros",style="max-height:100px;",
@@ -498,7 +605,8 @@ if("sofreu_algum_acidente_no_ultimo_ano_agrupado" %in% names(df) &
           tags$p(
             paste0(
               scales::percent(sum(str_detect(resp1,
-                                          "Sim|sim|SIM"))/length(resp)),
+                                          "Sim|sim|SIM"),
+                                  na.rm = T)/length(resp1)),
               " tem medo de acidentes"
             )
           )
@@ -513,7 +621,8 @@ if("sofreu_algum_acidente_no_ultimo_ano_agrupado" %in% names(df) &
           tags$p(
             paste0(
               scales::percent(sum(str_detect(resp2,
-                                          "Sim|sim|SIM"))/length(resp)),
+                                          "Sim|sim|SIM"),
+                                  na.rm = T)/length(resp2)),
               " sofreu acidente no último ano"
             )
           )
@@ -525,7 +634,7 @@ if("sofreu_algum_acidente_no_ultimo_ano_agrupado" %in% names(df) &
 }else{
   
   if("tem_medo_de_sofrer_acidentes_andando_de_bicicleta_em_fortaleza_agrupado" %in% names(df)){
-    resp <- df$voce_tem_medo_de_acidente_andando_de_bicicleta_em_fortaleza
+    resp <- df$tem_medo_de_sofrer_acidentes_andando_de_bicicleta_em_fortaleza_agrupado
     resp <- resp[resp!=""] %>% na.exclude()
     
     tags$table(
@@ -542,7 +651,8 @@ if("sofreu_algum_acidente_no_ultimo_ano_agrupado" %in% names(df) &
           tags$p(
             paste0(
               scales::percent(sum(str_detect(resp,
-                                          "Sim|sim|SIM"))/length(resp)),
+                                          "Sim|sim|SIM"),
+                                  na.rm = T)/length(resp)),
               " tem medo de acidentes"
             )
           )
@@ -571,7 +681,8 @@ if("sofreu_algum_acidente_no_ultimo_ano_agrupado" %in% names(df) &
           tags$p(
             paste0(
               scales::percent(sum(str_detect(resp,
-                                          "Sim|sim|SIM"))/length(resp)),
+                                          "Sim|sim|SIM"),
+                                  na.rm = T)/length(resp)),
               " sofreu acidente no último ano"
             )
           )
