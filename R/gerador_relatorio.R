@@ -126,6 +126,7 @@ for (i in 1:length(file_paths)) {
   })
   
   readRDS(file_paths[[i]]) %>% 
+    select(idade,genero,starts_with('existe_alguma_rua'),ends_with('agrupado')) %>% 
     fwrite(paste0('../edicoes/',nm[i],'/pesquisa_',nm[i],'.csv'))
   
 }
