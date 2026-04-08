@@ -1,4 +1,8 @@
 rm(list = ls())
+library(LDA)
+
+wd()
+
 system(
   paste0('Rscript "',
          normalizePath('gerador_relatorio.R'),
